@@ -676,6 +676,7 @@ class Site {
         if (response.url() === url.href) {
           this.analyzedUrls[url.href] = {
             status: response.status(),
+            title: response.text().match('<title>(.*)</title>')[1],
           }
 
           const rawHeaders = response.headers()
@@ -953,6 +954,7 @@ class Site {
       this.cache[url.href] = {
         page,
         html,
+        title,
         text,
         cookies,
         scripts,
@@ -1172,6 +1174,7 @@ class Site {
 
     const results = {
       urls: this.analyzedUrls,
+      title: title,
       technologies: resolve(this.detections).map(
         ({
           slug,
