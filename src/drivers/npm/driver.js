@@ -954,7 +954,6 @@ class Site {
       this.cache[url.href] = {
         page,
         html,
-        title,
         text,
         cookies,
         scripts,
@@ -1174,7 +1173,6 @@ class Site {
 
     const results = {
       urls: this.analyzedUrls,
-      title: title,
       technologies: resolve(this.detections).map(
         ({
           slug,
