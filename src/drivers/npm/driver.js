@@ -676,7 +676,6 @@ class Site {
         if (response.url() === url.href) {
           this.analyzedUrls[url.href] = {
             status: response.status(),
-            title: response.text().match('<title>(.*)</title>')[1],
           }
 
           const rawHeaders = response.headers()
@@ -795,6 +794,7 @@ class Site {
       }
 
       let links = []
+      let title = ''
       let text = ''
       let css = ''
       let scriptSrc = []
@@ -829,6 +829,23 @@ class Site {
               [],
               'Timeout (links)'
             )
+
+        // Text
+        title = await this.promiseTimeout(
+          (
+            await this.promiseTimeout(
+              page.evaluateHandle(
+                () =>
+                  // eslint-disable-next-line unicorn/prefer-text-content
+                  document.title
+              ),
+              { jsonValue: () => '' },
+              'Timeout (title)'
+            )
+          ).jsonValue(),
+          '',
+          'Timeout (title)'
+        )
 
         // Text
         text = await this.promiseTimeout(
@@ -954,6 +971,7 @@ class Site {
       this.cache[url.href] = {
         page,
         html,
+        title,
         text,
         cookies,
         scripts,
@@ -1173,6 +1191,7 @@ class Site {
 
     const results = {
       urls: this.analyzedUrls,
+      title: this.cache[url.href].title,
       technologies: resolve(this.detections).map(
         ({
           slug,
