@@ -1211,8 +1211,6 @@ class Site {
 
     const results = {
       urls: this.analyzedUrls,
-      title: this.cache[url.href].title,
-      description: this.cache[url.href].description,
       technologies: resolve(this.detections).map(
         ({
           slug,
@@ -1243,6 +1241,11 @@ class Site {
         })
       ),
       patterns,
+    }
+
+    if (this.cache[url.href]) {
+      results.title = this.cache[url.href].title
+      results.description = this.cache[url.href].description
     }
 
     await this.emit('analyze', results)
