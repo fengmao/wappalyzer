@@ -795,6 +795,7 @@ class Site {
 
       let links = []
       let title = ''
+      let description = ''
       let text = ''
       let css = ''
       let scriptSrc = []
@@ -830,7 +831,25 @@ class Site {
               'Timeout (links)'
             )
 
-        // Text
+        // description
+        description = await this.promiseTimeout(
+          (
+            await this.promiseTimeout(
+              page.evaluateHandle(() =>
+                // eslint-disable-next-line unicorn/prefer-text-content
+                document
+                  .querySelector("meta[name='description']")
+                  .getAttribute('content')
+              ),
+              { jsonValue: () => '' },
+              'Timeout (description)'
+            )
+          ).jsonValue(),
+          '',
+          'Timeout (description)'
+        )
+
+        // title
         title = await this.promiseTimeout(
           (
             await this.promiseTimeout(
@@ -971,6 +990,7 @@ class Site {
       this.cache[url.href] = {
         page,
         html,
+        description,
         title,
         text,
         cookies,
@@ -1192,6 +1212,7 @@ class Site {
     const results = {
       urls: this.analyzedUrls,
       title: this.cache[url.href].title,
+      description: this.cache[url.href].description,
       technologies: resolve(this.detections).map(
         ({
           slug,
